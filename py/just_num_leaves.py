@@ -8,23 +8,29 @@ import warnings  # 忽略普通警告，不打印太多东西
 
 
 
-def just_num_leaves(X, y, start_num=10, end_num=101, step=10):
+def just_num_leaves(X, y, start_num=20, end_num=101, step=10):
     """
     功能: 找到最优num_leaves参数，以此类推找出全部的最优参
     why: 最优参数组能让模型效果更好，一般提升在0~5%左右，如果提升超过5%，那么就要考虑特征是否选取正确，是否有过多的噪音数据。
     X: 数据X（无标签/df型）
     y: 数据y（标签/df型）
-    start_num: 开始值
-    end_num: 最大值
-    step: 步数
+    start_num: 开始值 (设置为20)
+    end_num: 最大值 (设置为101)
+    step: 步数 (设置为10)
     return: 最佳num_leaves
     """
     param_dic = {'num_leaves': range(start_num, end_num, step)}
-    gscv = GridSearchCV(estimator=lgb.LGBMClassifier(max_depth=20, min_data_in_bin=5, max_bin=200,
-                                                     min_child_samples=90, n_estimators=20000,
-                                                     objective='binary', boosting_type='gbdt', learning_rate=0.02,
-                                                     lambda_l2=5),
+    gscv = GridSearchCV(estimator=lgb.LGBMClassifier(max_depth=10,  # 设置适中深度
+                                                     min_data_in_bin=5,
+                                                     max_bin=200,
+                                                     min_child_samples=20,  # 适中值
+                                                     n_estimators=2000,  # 减少树的数量以加快训练
+                                                     objective='binary',
+                                                     boosting_type='gbdt',
+                                                     learning_rate=0.03,  # 合理学习率
+                                                     lambda_l2=1),  # 较小的L2正则化
                        param_grid=param_dic, scoring='f1', cv=5)
     gscv.fit(X, y)
     print("best_params:{0}".format(gscv.best_params_))
     print("best_score:{0}".format(gscv.best_score_))
+    return gscv

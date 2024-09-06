@@ -26,9 +26,12 @@ def rfecv_(X, y, feats, lgb_model, cv=5, scoring='roc_auc',verbose=1):
         rfe_cv_model: 特征相关信息对象
         selected_feat: 当前数据消除后特征组
     """
-    lgb_model = lgb.LGBMClassifier(**lgb_params)  # 传入参数字典
-    rfe_cv_model = RFECV(lgb_model, cv=5, scoring='roc_auc', verbose=1) # 自动选择特定的特征数量,cv为多少折，scoring为评分标准，verbose为信息显示
-    rfe_cv_model.fit(X, y)  # 开始训练
-    selected_feat = np.array(feats)[rfe_cv_model.support_].tolist()  # 拿出特征
+    rfe_cv_model = RFECV(lgb_model, cv=cv, scoring=scoring, verbose=verbose)
+    rfe_cv_model.fit(X, y)
+    selected_feat = np.array(feats)[rfe_cv_model.support_].tolist()
     print("剩余特征：", len(selected_feat))
-    return rfe_cv_model, selected_feat
+    print("剩余特征为：")
+    for feat in selected_feat:
+        print(feat)
+    selected_feat_df = pd.DataFrame(selected_feat, columns=['Selected Features'])
+    return rfe_cv_model, selected_feat_df

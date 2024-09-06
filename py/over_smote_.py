@@ -35,37 +35,3 @@ def over_smote_(X, y, num):
         return X_resampled, y_resampled
     else:
         print("过采样校验：失败")
-
-#仅测试用
-def main():
-    # 加载处理好的训练数据
-    train_path = '../data/processed_train.csv'
-    df_train = pd.read_csv(train_path)
-
-    # 假设 'Attrition_Flag' 是标签列
-    try:
-        X_train = df_train.drop('Attrition_Flag', axis=1)  # 提取特征数据
-        y_train = df_train['Attrition_Flag']  # 提取标签数据
-    except KeyError as e:
-        print(f"错误：找不到列 {e}。请检查数据文件的列名是否正确。")
-        return
-
-    # 确保所有特征是数值型
-    non_numeric_columns = X_train.select_dtypes(include=['object', 'category']).columns
-    if not non_numeric_columns.empty:
-        print(f"检测到非数值列: {non_numeric_columns.tolist()}")
-        X_train = pd.get_dummies(X_train, columns=non_numeric_columns, drop_first=True)
-
-    # 定义需要增加的少数类样本数量
-    num_to_increase = 500  # 假设需要增加500个少数类样本
-
-    # 应用 SMOTE 进行过采样
-    X_resampled, y_resampled = over_smote_(X_train, y_train, num_to_increase)
-
-    # 输出结果
-    print(f"原始训练集样本数: {X_train.shape[0]}, 过采样后训练集样本数: {X_resampled.shape[0]}")
-    print("类别分布：")
-    print(y_resampled.value_counts())
-
-if __name__ == "__main__":
-    main()
