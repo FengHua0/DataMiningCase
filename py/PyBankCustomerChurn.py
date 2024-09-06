@@ -1,3 +1,5 @@
+import numpy as np
+
 from dataset_process import load_data, split_data
 from preprocessing import preprocessing
 from over_smote_ import over_smote_
@@ -28,8 +30,8 @@ def main():
 
     # 计算过采样数量并进行过采样
     counts = y_train.value_counts()
-    num_to_increase = abs(counts[1] - counts[0])
-    train_X_resampled, train_y_resampled = over_smote_(X_train, y_train, num_to_increase)
+    num_to_increase = int(abs(counts[1] - counts[0]) / 3)
+    X_resampled, y_resampled = over_smote_(X_train, y_train, num_to_increase)
 
     # 特征选择
     lgb_model = lgb.LGBMClassifier(
@@ -49,19 +51,23 @@ def main():
         metric='auc',
         verbosity=-1
     )
-    feats = train_X_resampled.columns.tolist()
-    _, train_selected_feats = rfecv_(train_X_resampled, train_y_resampled, feats, lgb_model)
+    feats = X_resampled.columns.tolist()
+    _, train_selected_feats = rfecv_(X_resampled, y_resampled, feats, lgb_model)
 
     # 参数调优
-    train_selected = train_X_resampled[train_selected_feats]
-    num_leave = just_num_leaves(train_selected, train_y_resampled, start_num=10, end_num=60, step=10)
+    train_selected = X_resampled[train_selected_feats]
+    num_leave = just_num_leaves(train_selected, y_resampled, start_num=20, end_num=150, step=10)
 
     # 加载数据
     y_test = df_processed['Attrition_Flag']
     X_test = df_processed.drop('Attrition_Flag', axis=1)
 
+    # debugs
+    print(f"train_selected shape: {train_selected.shape}")
+    print(f"train_y_resampled shape: {y_resampled.shape}")
+
     # 二折交叉验证
-    clf = train_2_cross(df_processed, train_selected, train_y_resampled, X_test, y_test, thresholds=0.45, csv_name='final', num_leave=num_leave)
+    clf = train_2_cross(df_processed, train_selected, y_resampled, X_test, y_test, thresholds=0.45, csv_name='final', num_leave=num_leave)
 
 if __name__ == '__main__':
     main()

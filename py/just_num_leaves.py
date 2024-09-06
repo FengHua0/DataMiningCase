@@ -33,4 +33,7 @@ def just_num_leaves(X, y, start_num=20, end_num=101, step=10):
     gscv.fit(X, y)
     print("best_params:{0}".format(gscv.best_params_))
     print("best_score:{0}".format(gscv.best_score_))
-    return gscv
+    # 返回最佳的 num_leaves 参数值，确保是整数类型
+
+    best_num_leaves = int(gscv.best_params_['num_leaves'])
+    return best_num_leaves

@@ -10,7 +10,7 @@ import warnings  # 忽略普通警告，不打印太多东西
 warnings.filterwarnings('ignore')
 
 
-def train_2_cross(df_pre, X, y, X_test_v1, y_test_v1, thresholds=0.45, id_1='id', csv_name=0, num_leave = 20):
+def train_2_cross(df_pre, X, y, X_test_v1, y_test_v1, thresholds=0.45, id_1='CLIENTNUM', csv_name=0, num_leave = 20):
     """
     功能: 切分一次训练，输出名单
     why: 两折一般是上线的版本。因为比较简单直接
@@ -26,11 +26,10 @@ def train_2_cross(df_pre, X, y, X_test_v1, y_test_v1, thresholds=0.45, id_1='id'
     """
     y_pred_input = np.zeros(len(X_test_v1))  # 相应大小的零矩阵
     train_x, vali_x, train_y, vali_y = train_test_split(X, y, test_size=0.33, random_state=1234)
-    clf = lgb.LGBMClassifier(max_depth=20, min_data_in_bin=5, max_bin=200,
-                            min_child_samples=90, num_leaves=num_leave, n_estimators=20000,
-                            objective='binary', boosting_type='gbdt', learning_rate=0.02,
+    clf = lgb.LGBMClassifier(max_depth=-1, min_data_in_bin=5, max_bin=200,
+                            min_child_samples=90, num_leaves=num_leave, n_estimators=1000,
+                            objective='binary', boosting_type='gbdt', learning_rate=0.05,
                             lambda_l2=5)
-    #TODO a bug need fix
     clf.fit(train_x, train_y, eval_set=[(vali_x, vali_y)], eval_metric='f1')
     # 这里的参数不懂的去GitHub搜LightGBM的参数解释
 
@@ -67,7 +66,7 @@ def train_2_cross(df_pre, X, y, X_test_v1, y_test_v1, thresholds=0.45, id_1='id'
 
     print("================开始输出名单==================")
     y_pred_input_precision = y_pre_proba_test[:, 1] > thresholds  # 获取高精确率的标签
-    submission = pd.DataFrame({"id": df_pre[id_1],
+    submission = pd.DataFrame({"CLIENTNUM": df_pre[id_1],
                               "概率": y_pre_proba_test[:, 1],
                               "高精确": y_pred_input_precision})
     if csv_name != 0:

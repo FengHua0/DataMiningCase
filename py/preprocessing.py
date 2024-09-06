@@ -62,7 +62,7 @@ def preprocessing(df, feats_list=0, label='Attrition_Flag', id_1='CLIENTNUM'):
 
     if feats_list == 0:
         print(f"使用全部特征")
-        X = df[df.columns.drop([id_1])]
+        X = df
     elif type(feats_list) == list:
         print(f"使用列表特征，长度为：", len(feats_list))
         X = df[feats_list]
