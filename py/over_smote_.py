@@ -36,6 +36,7 @@ def over_smote_(X, y, num):
     else:
         print("过采样校验：失败")
 
+#仅测试用
 def main():
     # 加载处理好的训练数据
     train_path = '../data/processed_train.csv'

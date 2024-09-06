@@ -29,12 +29,14 @@ def split_data(df, test_size=0.20, val_size=0.10):
     # 划分出验证集
     train_data, val_data = train_test_split(train_val_data, test_size=valid_test_size, random_state=42)
 
-    return train_data, val_data, test_data
+    train_data.to_csv('../data/train.csv', index=False)
+    val_data.to_csv('../data/val.csv', index=False)
+    test_data.to_csv('../data/test.csv', index=False)
 
 #测试用
 if __name__ == "__main__":
     # 指定数据文件路径
-    data_path = '../data/data.csv'
+    data_path = '../data/processed_data.csv'
 
     # 加载数据
     df = load_data(data_path)
