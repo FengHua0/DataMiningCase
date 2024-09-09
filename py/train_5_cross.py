@@ -10,7 +10,7 @@ import warnings  # 忽略普通警告，不打印太多东西
 warnings.filterwarnings('ignore')
 
 
-def train_5_cross(df_pre, X,y, X_test_v1,y_test_v1, thresholds=0.45, id_1='id', csv_name=0):
+def train_5_cross(df_pre, X,y, X_test_v1,y_test_v1, thresholds=0.45, id_1='CLIENTNUM', csv_name=0, num_leave=20):
     """
     功能: 五折训练并输出名单
     why: 5折一般是效果比较稳定的，用于线下做的。
@@ -39,11 +39,10 @@ def train_5_cross(df_pre, X,y, X_test_v1,y_test_v1, thresholds=0.45, id_1='id', 
         
         # 以下为调过参的lgb模型
         clf = lgb.LGBMClassifier(max_depth=20, min_data_in_bin=5, max_bin=200,
-                                min_child_samples=90, num_leaves=20, n_estimators=20000,
-                                objective='binary', boosting_type='gbdt', learning_rate=0.02,
+                                min_child_samples=90, num_leaves=num_leave, n_estimators=20000,
+                                objective='binary', boosting_type='gbdt', learning_rate=0.05,
                                 lambda_l2=5)
-        clf.fit(train_x, trai_y, eval_set=[(train_x, trai_y), (vali_x, vali_y)], verbose=0,
-               early_stopping_rounds=100, eval_metric='f1')
+        clf.fit(train_x, trai_y, eval_set=[(train_x, trai_y), (vali_x, vali_y)], eval_metric='f1')
         
         # 不懂的去GitHub看搜LightGBM的参数解释
         
@@ -95,7 +94,7 @@ def train_5_cross(df_pre, X,y, X_test_v1,y_test_v1, thresholds=0.45, id_1='id', 
     print("================开始输出名单==================")
     y_pred_input_end = y_pred_input / 5  # 前面是做了5次相加，所以这次要除以5
     y_pred_input_precision = y_pred_input_end > thresholds  # 获取高精确率的标签
-    submission = pd.DataFrame({"id": df_pre[id_1],
+    submission = pd.DataFrame({"CLIENTNUM": df_pre[id_1],
                               "概率": y_pred_input_end,
                               "高精确": y_pred_input_precision})
     if csv_name != 0:

@@ -10,6 +10,7 @@ import warnings  # 忽略普通警告，不打印太多东西
 from sklearn.feature_selection import RFE, RFECV  # 递归消除选特征，前者是自己选优化到多少位，后者是自动cv优化到最佳
 from imblearn.under_sampling import RandomUnderSampler  # 朴素随机过采样，由于是比较旧的这里不做例子
 from imblearn.over_sampling import SMOTE, ADASYN  # 目前流行的过采样
+import time
 
 warnings.filterwarnings('ignore')
 
@@ -25,7 +26,9 @@ def over_smote_(X, y, num):
         y_resampled: 过采样后的y
     """
     ss = pd.Series(y).value_counts()
-    smote = SMOTE(sampling_strategy={0: ss[0], 1: ss[1] + num}, random_state=2019)  # radom_state为随机值种子，1:ss[1]+表示label为1的数据增加多少个
+    # 获取当前时间作为随机种子
+    random_seed = int(time.time())
+    smote = SMOTE(sampling_strategy={1: ss[1], 0: ss[0] + num}, random_state=random_seed)  # radom_state为随机值种子，0:ss[0]+表示label为0的数据增加多少个
     X_resampled, y_resampled = smote.fit_resample(X, y)
     print("过采样个数为：", num)
     check_num_X = X_resampled.shape[0] - X.shape[0]
