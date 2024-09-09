@@ -14,7 +14,7 @@ from imblearn.over_sampling import SMOTE, ADASYN  # 目前流行的过采样
 # ADASYN: 关注的是在那些基于K最近邻分类器被错误分类的原始样本附近生成新的少数类样本;
 
 
-def rfecv_(X, y, feats, lgb_model, cv=5, scoring='roc_auc',verbose=1):
+def rfecv_(X, y, feats, cv=5, scoring='roc_auc'):
     """
     功能: 减少特征，递归消除选特征，输出结果最优最少的特征组。基于lgb模型
     why: 防止特征冗余，该方法有一定的正反性，即最佳的特征组可能是当前数据的最近，以后数据变化了可能就不是了，建议多测几次。
@@ -26,7 +26,25 @@ def rfecv_(X, y, feats, lgb_model, cv=5, scoring='roc_auc',verbose=1):
         rfe_cv_model: 特征相关信息对象
         selected_feat: 当前数据消除后特征组
     """
-    rfe_cv_model = RFECV(lgb_model, cv=cv, scoring=scoring, verbose=verbose)
+    lgb_model = lgb.LGBMClassifier(
+        max_depth=7,  # 控制树的最大深度，防止过拟合
+        num_leaves=31,  # 叶子节点数量，较小的值可以防止过拟合
+        min_child_samples=20,  # 每个叶子最少样本数，增大可以减少过拟合
+        min_gain_to_split=0.01,  # 分裂的最小增益
+        learning_rate=0.05,  # 学习率，较大的值配合较少的树
+        n_estimators=500,  # 树的数量，控制训练时间，防止过拟合
+        feature_fraction=0.8,  # 每次训练选择的特征比例
+        bagging_fraction=0.8,  # 每次训练选择的数据比例
+        bagging_freq=5,  # bagging的频率
+        lambda_l1=1,  # L1正则化
+        lambda_l2=1,  # L2正则化
+        objective='binary',  # 二分类
+        boosting_type='gbdt',  # 梯度提升树
+        metric='f1',  # 使用AUC作为评价指标，更适合不平衡数据集
+        verbosity=-1,  # 控制输出
+    )
+    print("================开始挑选特征================")
+    rfe_cv_model = RFECV(lgb_model, cv=cv, scoring=scoring, verbose=0)
     rfe_cv_model.fit(X, y)
     selected_feat = np.array(feats)[rfe_cv_model.support_].tolist()
     print("剩余特征：", len(selected_feat))

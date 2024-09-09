@@ -38,10 +38,10 @@ def train_5_cross(df_pre, X,y, X_test_v1,y_test_v1, thresholds=0.45, id_1='CLIEN
         vali_x, vali_y = X.loc[val_idx], y.loc[val_idx]
         
         # 以下为调过参的lgb模型
-        clf = lgb.LGBMClassifier(max_depth=20, min_data_in_bin=5, max_bin=200,
-                                min_child_samples=90, num_leaves=num_leave, n_estimators=20000,
+        clf = lgb.LGBMClassifier(max_depth=10, min_data_in_bin=5, max_bin=200,
+                                min_child_samples=40, num_leaves=num_leave, n_estimators=1000,
                                 objective='binary', boosting_type='gbdt', learning_rate=0.05,
-                                lambda_l2=5)
+                                lambda_l2=1, verbosity=-1)
         clf.fit(train_x, trai_y, eval_set=[(train_x, trai_y), (vali_x, vali_y)], eval_metric='f1')
         
         # 不懂的去GitHub看搜LightGBM的参数解释

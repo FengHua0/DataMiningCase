@@ -24,12 +24,13 @@ def just_num_leaves(X, y, start_num=20, end_num=101, step=10, cv=5):
                                                      min_data_in_bin=5,
                                                      max_bin=200,
                                                      min_child_samples=20,  # 适中值
-                                                     n_estimators=2000,  # 减少树的数量以加快训练
+                                                     n_estimators=800,  # 减少树的数量以加快训练
                                                      objective='binary',
                                                      boosting_type='gbdt',
-                                                     learning_rate=0.03,  # 合理学习率
+                                                     learning_rate=0.01,  # 合理学习率
                                                      lambda_l2=1),  # 较小的L2正则化
                        param_grid=param_dic, scoring='f1', cv=cv)
+    print("================开始计算深度================")
     gscv.fit(X, y)
     print("best_params:{0}".format(gscv.best_params_))
     print("best_score:{0}".format(gscv.best_score_))

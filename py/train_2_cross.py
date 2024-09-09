@@ -20,16 +20,21 @@ def train_2_cross(df_pre, X, y, X_test_v1, y_test_v1, thresholds=0.45, id_1='CLI
     y_test_v1: 预测数据y（无标签/df型）
     thresholds: 阈值选择，默认0.45高精确率
     csv_name: 保存csv的名称，默认不保存
-    returen:
+    return:
         客户名单及情况
         clf: 已训练好的模型
     """
     y_pred_input = np.zeros(len(X_test_v1))  # 相应大小的零矩阵
     train_x, vali_x, train_y, vali_y = train_test_split(X, y, test_size=0.33, random_state=1234)
-    clf = lgb.LGBMClassifier(max_depth=-1, min_data_in_bin=5, max_bin=200,
-                            min_child_samples=90, num_leaves=num_leave, n_estimators=1000,
+    # train_x.to_csv('../data/train_x.csv', index=False)
+    # vali_x.to_csv('../data/vali_x.csv', index=False)
+    # train_y.to_csv('../data/train_y.csv', index=False)
+    # vali_y.to_csv('../data/vali_y.csv', index=False)
+    print("================开始二折交叉验证================")
+    clf = lgb.LGBMClassifier(class_weight='balanced', max_depth=10, min_data_in_bin=5, max_bin=200,
+                            min_child_samples=30, num_leaves=num_leave, n_estimators=1000,
                             objective='binary', boosting_type='gbdt', learning_rate=0.05,
-                            lambda_l2=5)
+                            lambda_l2=1)
     clf.fit(train_x, train_y, eval_set=[(vali_x, vali_y)], eval_metric='f1')
     # 这里的参数不懂的去GitHub搜LightGBM的参数解释
 

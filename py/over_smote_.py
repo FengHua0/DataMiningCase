@@ -25,6 +25,7 @@ def over_smote_(X, y, num):
         X_resampled: 过采样后的X
         y_resampled: 过采样后的y
     """
+    print("=================开始过采样=================")
     ss = pd.Series(y).value_counts()
     # 获取当前时间作为随机种子
     random_seed = int(time.time())

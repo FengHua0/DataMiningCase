@@ -3,18 +3,11 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-def load_data(file_path):
-    """
-    加载单个数据文件。
-    """
-    df = pd.read_csv(file_path)
-    return df
-
 def preprocessing(df, feats_list=0, label='Attrition_Flag', id_1='CLIENTNUM'):
     """
     对数据集进行预处理，并将处理后的数据保存到CSV文件。
     """
-    print("=============开始处理数据集===============")
+    print("================开始处理数据集================")
     print(f"未处理数据集大小：", df.shape)
 
     # 检查指定列（如 CLIENTNUM）上的重复并删除
@@ -78,16 +71,3 @@ def preprocessing(df, feats_list=0, label='Attrition_Flag', id_1='CLIENTNUM'):
     file_name = "../data/processed_data.csv"
     df_final.to_csv(file_name, index=False)
     print(f"数据已保存到 {file_name}")
-
-    print("==============数据处理和保存完成=================")
-
-# 仅测试用
-if __name__ == '__main__':
-    # 指定数据文件路径
-    data_path = '../data/data.csv'
-
-    # 加载数据
-    df = load_data(data_path)
-
-    # 进行预处理并保存数据到文件
-    preprocessing(df)
