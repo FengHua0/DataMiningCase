@@ -57,6 +57,7 @@ def model_fusion(train, test):
     :param train: 训练集 DataFrame
     :param test: 测试集 DataFrame
     """
+    print("================模型融合训练================")
     print("数据集大小：", train.shape, test.shape)
     train = train.fillna(-999)  # 填充缺失值
     test = test.fillna(-999)
@@ -80,8 +81,7 @@ def model_fusion(train, test):
         train_y, valid_y = y[train_idx], y[test_idx]
         dtrain = lgb.Dataset(train_x, train_y, feature_name=feats)
         dvalid = lgb.Dataset(valid_x, valid_y, feature_name=feats)
-        model = lgb.train(lgb_params, dtrain, num_boost_round=2000, valid_sets=dvalid,
-                          early_stopping_rounds=50, verbose_eval=50)
+        model = lgb.train(lgb_params, dtrain, num_boost_round=2000, valid_sets=dvalid)
         valid_pred = model.predict(valid_x, num_iteration=model.best_iteration)
         train_feats[test_idx] = valid_pred
         auc_score = roc_auc_score(valid_y, valid_pred)
@@ -106,13 +106,13 @@ def model_fusion(train, test):
         watchlist = [(dvalid, 'eval')]
         model = xgb.train(xgb_params, dtrain, num_boost_round=2000, evals=watchlist,
                           early_stopping_rounds=50, verbose_eval=50)
-        valid_pred = model.predict(dvalid, ntree_limit=model.best_iteration)
+        valid_pred = model.predict(dvalid)
         train_feats_xgb[test_idx] = valid_pred
         auc_score = roc_auc_score(valid_y, valid_pred)
         print('XGBoost auc score: ', auc_score)
         cv_score_xgb.append(auc_score)
         dtest = xgb.DMatrix(X_test, feature_names=feats)
-        test_pred_xgb += model.predict(dtest, ntree_limit=model.best_iteration)
+        test_pred_xgb += model.predict(dtest)
 
     test_pred_xgb /= 5
     blend_train['xgb_feat'] = train_feats_xgb

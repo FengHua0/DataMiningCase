@@ -16,25 +16,19 @@ def main():
     # 数据预处理
     data_path = '../data/data.csv'
     df = load_data(data_path)
-    preprocessing(df)
+    train_data, test_data = split_data(df)
+    dt_train, dt_pre, X, y, X_test_v1, y_test_v1 = preprocessing(train_data, test_data)
 
-    # 数据集划分
-    processed_data_path = '../data/processed_data.csv'
-    total_data = load_data(processed_data_path)
-    df_processed, test_data = split_data(total_data)
+    # # 数据集划分
+    # processed_data_path = '../data/processed_data.csv'
+    # total_data = load_data(processed_data_path)
+    # df_processed, test_data = split_data(total_data)
 
     # 过采样
-    try:
-        X_train = df_processed.drop('Attrition_Flag', axis=1)
-        y_train = df_processed['Attrition_Flag']
-    except KeyError as e:
-        print(f"错误：找不到列 {e}。请检查数据文件的列名是否正确。")
-        return
-
     # 计算过采样数量并进行过采样
-    counts = y_train.value_counts()
+    counts = y.value_counts()
     num_to_increase = abs(counts[1] - counts[0])
-    X_resampled, y_resampled = over_smote_(X_train, y_train, num_to_increase)
+    X_resampled, y_resampled = over_smote_(X, y, num_to_increase)
     # X_resampled.to_csv('../data/X_resampled.csv', index=False)
     # y_resampled.to_csv('../data/y_resampled.csv', index=False)
     # print(y_resampled.value_counts(0))
@@ -54,19 +48,21 @@ def main():
     # train_selected.to_csv('../data/train_selected.csv', index=False)
     num_leave = just_num_leaves(train_selected, y_resampled, start_num=20, end_num=100, step=10, cv=2)
 
-    # 参数
-    y_test = test_data['Attrition_Flag']
-    X_test = test_data[selected_feature_names]
+    # 二折交叉验证参数
+    y_test = dt_pre['Attrition_Flag']
+    X_test = dt_pre[selected_feature_names]
 
     # 二折交叉验证
-    clf_2 = train_2_cross(test_data, train_selected, y_resampled, X_test, y_test, thresholds=0.45, csv_name='2', num_leave=num_leave)
+    clf_2 = train_2_cross(dt_pre, train_selected, y_resampled, X_test, y_test, thresholds=0.45, csv_name='2', num_leave=num_leave)
 
     # 五折交叉验证参数
     _, train_selected_feats = rfecv_(X_noCLIENTNUM, y_resampled, feats, cv=5)
     num_leave = just_num_leaves(train_selected, y_resampled, start_num=10, end_num=100, step=10, cv=5)
     #debugs
     # 五折交叉验证
-    clf_5 = train_5_cross(test_data, train_selected, y_resampled, X_test, y_test, thresholds=0.45, csv_name='5', num_leave=num_leave)
+    clf_5 = train_5_cross(dt_pre, train_selected, y_resampled, X_test, y_test, thresholds=0.45, csv_name='5', num_leave=num_leave)
+
+    model_fusion(dt_train,dt_pre)
 
 if __name__ == '__main__':
     main()
