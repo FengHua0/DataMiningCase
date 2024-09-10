@@ -8,7 +8,16 @@ def GBCtrain(X_train, y_train, X_test, y_test):
 
     print("================开始训练================")
     # 初始化和训练模型
-    gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
+    gbc = GradientBoostingClassifier(
+        n_estimators=300,  # 树的数量
+        learning_rate=0.05,  # 学习率
+        max_depth=4,  # 树的最大深度
+        subsample=0.8,  # 采样比例
+        min_samples_split=10,  # 最小样本分裂数
+        min_samples_leaf=4,  # 叶节点最小样本数
+        max_features='sqrt',  # 使用的最大特征数
+        random_state=42  # 随机种子
+    )
     gbc.fit(X_train, y_train)
 
     # 进行预测
