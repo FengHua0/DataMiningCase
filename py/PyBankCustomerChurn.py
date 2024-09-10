@@ -5,7 +5,6 @@ from dataset_process import load_data, split_data
 from notebook.py_bar import plt_data
 from preprocessing import preprocessing
 from over_smote_ import over_smote_
-from model_fusion import model_fusion
 from py.auc_plot import auc_plot
 from py.just_num_leaves import just_num_leaves
 from py.metrics_plot import metrics_plot
