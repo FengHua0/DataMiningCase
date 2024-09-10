@@ -75,7 +75,7 @@ def metrics_plot(y, y_prob, thres=0.45, png_savename=0):
                                                                                          '{0:.1f}'.format(float(vali_precision)*100)))
     if png_savename!=0:
         plt.savefig("%s_混淆矩阵.png" % png_savename,dpi=300)  # 保存混淆矩阵图
-        
+
 
 def importance_plt(X, clf, png_savename=0):
     """
@@ -89,7 +89,10 @@ def importance_plt(X, clf, png_savename=0):
     feats_list = X.columns.values  # 获取全部特征
     feats_importance = clf.feature_importances_  # 获取特征使用次数
     sorted_idx = np.argsort(feats_importance)
-    
+
+    # 找到最重要的特征
+    most_important_feat = feats_list[sorted_idx][-2]  # 取倒数第二个的特征
+
     plt.figure(figsize=(10, 55))
     # 下面是画图操作
     plt.barh(range(len(sorted_idx)), feats_importance[sorted_idx])
@@ -99,8 +102,8 @@ def importance_plt(X, clf, png_savename=0):
     if png_savename:
         plt.savefig("特征重要性.png", dpi=500, bbox_inches='tight')  # 由于特征过多图片过大，需要处理才能让图片全部保存下来,dpi清晰度
     plt.show()
+    return most_important_feat
 
-    
 def fit_importance_plt(feats_list, feats_importance, png_savename=0):
     """
     功能:打印特征重要图

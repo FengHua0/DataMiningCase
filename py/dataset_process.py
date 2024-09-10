@@ -26,6 +26,8 @@ def split_data(df, test_size=0.10):
         label_encoder = LabelEncoder()
         for col in non_numeric_columns:
             df[col] = label_encoder.fit_transform(df[col])
+
+    df.to_csv('../data/processed_data.csv', index=False)
     # 划分出测试集
     train_data, test_data = train_test_split(df, test_size=test_size, random_state=42)
 

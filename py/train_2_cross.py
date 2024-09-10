@@ -31,7 +31,7 @@ def train_2_cross(df_pre, X, y, X_test_v1, y_test_v1, thresholds=0.45, id_1='CLI
     # train_y.to_csv('../data/train_y.csv', index=False)
     # vali_y.to_csv('../data/vali_y.csv', index=False)
     print("================开始二折交叉验证================")
-    clf = lgb.LGBMClassifier(class_weight='balanced', max_depth=10, min_data_in_bin=5, max_bin=200,
+    clf = lgb.LGBMClassifier(class_weight='balanced', max_depth=20, min_data_in_bin=5, max_bin=200,
                             min_child_samples=30, num_leaves=num_leave, n_estimators=1000,
                             objective='binary', boosting_type='gbdt', learning_rate=0.05,
                             lambda_l2=1)
