@@ -31,6 +31,8 @@ def main():
     # 计算过采样数量并进行过采样
     counts = y.value_counts()
     num_to_increase = abs(counts[1] - counts[0])
+    if min(counts.iloc[0], counts.iloc[1]) > ((counts.iloc[0] + counts.iloc[1]) / 99):
+        num_to_increase = 0
     X_resampled, y_resampled = over_smote_(X, y, num_to_increase)
     # X_resampled.to_csv('../data/X_resampled.csv', index=False)
     # y_resampled.to_csv('../data/y_resampled.csv', index=False)
