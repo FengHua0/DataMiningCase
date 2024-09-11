@@ -22,6 +22,11 @@ def split_data(df, test_size=0.10):
     non_numeric_columns = df.select_dtypes(include=['object', 'category']).columns
     if not non_numeric_columns.empty:
         print(f"检测到非数值列: {non_numeric_columns.tolist()}")
+
+        # 检查Attrition_Flag列并将Existing Customer设为0，其他设为1
+        if 'Attrition_Flag' in df.columns:
+            df['Attrition_Flag'] = df['Attrition_Flag'].apply(lambda x: 0 if x == 'Existing Customer' else 1)
+
         # 使用LabelEncoder进行标签编码
         label_encoder = LabelEncoder()
         for col in non_numeric_columns:
