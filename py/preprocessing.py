@@ -30,8 +30,9 @@ def preprocessing(df_train, df_pre, feats_list=0, label='Attrition_Flag', id_1='
     print("未处理训练集数据大小：", df_train.shape)
     print("未处理预测集数据大小：", df_pre.shape)
     try:
-        df_train.dropna(subset=[id_1, 'Customer_Age', 'Dependent_count', label], inplace=True)  # 删掉指定列为null值的行
-        df_pre.dropna(subset=[id_1, 'Customer_Age', 'Dependent_count', label], inplace=True)  # 预测集做同样的操作
+        # 删除所有包含空值的行
+        df_train.dropna(inplace=True)  # 删除训练集中所有包含空值的行
+        df_pre.dropna(inplace=True)  # 删除预测集中所有包含空值的行
     except KeyError:
         print("数据集里没有相应字段")
 
